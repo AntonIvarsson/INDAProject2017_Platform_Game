@@ -6,6 +6,7 @@ import MapStuff.BackGround;
 import MapStuff.GifBackground;
 import MapStuff.TileMap;
 import PhysicalObjects.Enemy;
+import PhysicalObjects.Explosion;
 import PhysicalObjects.HUD;
 import PhysicalObjects.PhysicalObjects.Enemies.Sten;
 import PhysicalObjects.Player;
@@ -21,27 +22,31 @@ public class Level1State extends GameState{
 
     private int isKen = 1;
 
-
     // spelaren
     private Player player;
 
     //Fiende
-    private Sten s, s1, s2, s3;
+    private Sten s, s1, s2, s3, s4;
 
     //Skapar en Arraylist med alla fiender.
     private ArrayList<Enemy> enemies;
+
+    private ArrayList<Explosion> explosions;
 
     // create HUD
     private HUD hud;
 
 
+    // Background
     private BackGround bg;
+
 
     private boolean SoundStarted = false;
 
     //Stuff for intro animation
     private GifBackground gifBG;
 
+    //Detta är giffen som säger vilken nivå vi är på
     private String[] urls = {
             "/Backgrounds/LevelGI/LevelGIF0000.png",
             "/Backgrounds/LevelGI/LevelGIF0001.png",
@@ -106,10 +111,12 @@ public class Level1State extends GameState{
             s1 = new Sten(tileMap);
             s2 = new Sten(tileMap);
             s3 = new Sten(tileMap);
+            s4 = new Sten(tileMap);
             enemies.add(s);
             enemies.add(s1);
             enemies.add(s2);
             enemies.add(s3);
+            enemies.add(s4);
 
             gifBG = new GifBackground(urls,GifBgFps);
             bg = new BackGround("/Backgrounds/BackgroundNight.png");
@@ -123,26 +130,30 @@ public class Level1State extends GameState{
     @Override
     public void init() {
 
-            // intierar skapning av spelare
+        // intierar skapning av spelare
 
-             //Positionera spelaren rätt
-            if(gsm.getPrevState() == 0) {
-                player.setPosition(200, 200);
-                s.setPosition(120, 120);
-                s1.setPosition(60, 100);
-                s2.setPosition(100, 0);
-                s3.setPosition(150, 150);
-            }
-            else {
-                System.out.println(player.getx() + " "  + player.gety());
-                player.setPosition(player.getx(),player.gety());
-                s.setPosition(s.getx(),s.gety());
-                s1.setPosition(s1.getx(),s1.gety());
-                s2.setPosition(s2.getx(),s2.gety());
-                s3.setPosition(s3.getx(),s3.gety());
-            }
+        //Positionera spelaren rätt
+        if(gsm.getPrevState() == 0) {
+            player.setPosition(200, 200);
+            s.setPosition(120, 120);
+            s1.setPosition(500, 200);
+            s2.setPosition(300, 150);
+            s3.setPosition(150, 150);
+            s4.setPosition(350, 150);
+        }
+        else {
+            System.out.println(player.getx() + " "  + player.gety());
+            player.setPosition(player.getx(),player.gety());
+            s.setPosition(s.getx(),s.gety());
+            s1.setPosition(s1.getx(),s1.gety());
+            s2.setPosition(s2.getx(),s2.gety());
+            s3.setPosition(s3.getx(),s3.gety());
+            s4.setPosition(s4.getx(),s4.gety());
+        }
 
-            hud = new HUD(player);
+        explosions = new ArrayList<>();
+
+        hud = new HUD(player);
 
 
 
@@ -164,34 +175,51 @@ public class Level1State extends GameState{
         );
 
         // set background
-        //TODO//TODO
-        //TODO
-        //TODO//TODO
-        //TODO
-        //TODO
+        // så den rör sig lite när man gåt
         //TODO se video 6
-        //TODO
-        //TODO
-        //TODO
-        //TODO
-        //TODO
-        //TODO
+
+
+        // attack enemies  (pass over the arrayList of enemies
+        player.checkAttack(enemies);
+
 
         // update all enemies
         for(int i = 0; i < enemies.size(); i++) {
-            enemies.get(i).update();
+            Enemy e = enemies.get(i);
+            e.update();
+            if(e.isDead()) {
+                enemies.remove(i);
+                i--;
 
 
+                // Jag castar om double till int här annars fungerar inte explosions.add(new Explosion
+                int intx = (int) e.getx();
+                int inty = (int) e.gety();
+
+
+                explosions.add(new Explosion(intx, inty));
+            }
 
         }
+
+
+        // update explosions
+        for(int i = 0; i < explosions.size(); i++) {
+
+            explosions.get(i).update();
+            if(explosions.get(i).shouldRemove()) {
+                explosions.remove(i);
+            }
+
+        }
+
+
+
         //TODO PAPPA FIXAR
         if(player.gety() > 400) {
             prepareStateChange();
             gsm.setState(4);
-
-
         }
-
 
 
     }
@@ -227,6 +255,12 @@ public class Level1State extends GameState{
 
             }
 
+            // draw explosions
+            for(int i = 0; i < explosions.size(); i++ ) {
+                explosions.get(i).draw(g);
+            }
+
+
             // draw HUD
             hud.draw(g);
         }
@@ -247,7 +281,7 @@ public class Level1State extends GameState{
         if(k == KeyEvent.VK_F){
 
             if(player.getLazer()>200){
-            player.setFiring();
+                player.setFiring();
             }else if(OptionsState.SoundOptions[OptionsState.currentSoundChoice].equals("On")){
                 EmptyClip.play();
             }

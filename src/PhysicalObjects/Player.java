@@ -67,7 +67,7 @@ public class Player extends MapObject {
 
             6, // IDLE
             10, // WALKING
-            1, // JUMPING
+            2, // JUMPING
             2, // FALLING
             4, // GLIDING
             2, // LAZERSHOT
@@ -80,9 +80,9 @@ public class Player extends MapObject {
     // Animation actions
     private static final int IDLE = 0;
     private static final int WALKING = 6;
-    private static final int JUMPING = 2;
+    private static final int JUMPING = 4;
     private static final int FALLING = 3;
-    private static final int GLIDING = 4;
+    private static final int GLIDING = 2;
     private static final int LAZERSHOT = 5;
     private static final int SWORDATTACK = 1;
 
@@ -232,6 +232,63 @@ public class Player extends MapObject {
         gliding = true;
     }
 
+
+    // som metodnamnet säger
+    public void checkAttack(ArrayList<Enemy> enemies) {
+
+
+        // loop trough enemies
+        for(int i = 0; i < enemies.size(); i++) {
+
+            Enemy e = enemies.get(i);
+
+            // swordAttack check
+            if(swordAttack){
+                if(facingRight) {
+                    if(e.getx() > x && e.getx() < x + swordRange && e.gety() > y - height/2 && e.gety() < y + height/2) {
+
+                        // då slå med den dammage sword fåttt
+                        e.hit(swordDamage);
+                    }
+
+                }
+                else {
+                    if(e.getx() < x && e.getx() > x + swordRange && e.gety() > y - height/2 && e.gety() < y + height/2) {
+
+                        // då slå med den dammage sword fåttt
+                        e.hit(swordDamage);
+                    }
+
+                }
+
+            }
+
+
+            //Lazershot
+            for(int j = 0; j < lazerBullet.size(); j++) {
+                if(lazerBullet.get(j).intersects(e)){
+
+                    e.hit(lazerDamage);
+                    lazerBullet.get(j).setHit();
+                    break;
+
+
+
+
+                }
+
+
+
+            }
+
+        }
+
+
+    }
+
+
+
+
     // should determine where the player will be next genom att läsa keyboard input
     // till exempel pressing left, nästa position är till vänder
     private void getNextPosition() {
@@ -264,9 +321,10 @@ public class Player extends MapObject {
             }
         }
 
-        // check: cannot attack while moving unless you in the air
-        if((currentAction == SWORDATTACK || currentAction == LAZERSHOT) && !(jumping || falling)) {
-            dx = 0;
+        //check: cannot attack while moving unless you in the air
+        // lägg till || currentAction == LAZERSHOT om du vill att spelaren står still när hon skjuter
+        if((currentAction == SWORDATTACK ) && !(jumping || falling)) {
+           dx = 0;
         }
 
 
@@ -424,8 +482,8 @@ public class Player extends MapObject {
 
         //todo Jag försöker ordna så att man dör när man faller under banan.
 
-      // if(gety() > 400) {
-       // }
+        // if(gety() > 400) {
+        // }
 
 
     }

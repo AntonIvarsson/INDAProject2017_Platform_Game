@@ -20,6 +20,8 @@ public class Sten extends Enemy {
 
     // Fields
 
+
+    // double tid1 = System.nanoTime();
     //Vi behöver en array som håller i alla spritebilder
     private BufferedImage[] sprites;
 
@@ -126,14 +128,27 @@ public class Sten extends Enemy {
 
         }
 
+        //if() {
+//            right = true;
+//            left = false;
+//
+//
+//
+//        }
+//        if(bottomRight) {
+//            right= false;
+//            left = true;
+
+       // }
+
         // Här kan vi sätta det faktiska rörelseschemat, rörelserna
         // if it is a wall go other direction
-        if(right && dx == 0) {
+        if(right && (dx == 0 || !bottomLeft) ) {                // todo jag har lagt till || !bottomRight i ett försök att hindra fienden att hoppa från en kant....
             right= false;
             left = true;
             facingRight = false;
 
-        } else if (left && dx == 0) {
+        } else if (left && (dx == 0 || !bottomRight)) {         // todo samma som ovan här
 
             right = true;
             left = false;
@@ -142,6 +157,20 @@ public class Sten extends Enemy {
 
 
         }
+
+/*
+        if(!bottomRight || !bottomLeft){
+            if(facingRight){
+                //right= false;
+               // left = true;
+                facingRight = false;
+
+            }else {
+               // right = true;
+                //left = false;
+                facingRight = true;
+            }
+        }*/
 
 
         // update animation
@@ -153,10 +182,13 @@ public class Sten extends Enemy {
 
     }
 
+
+
     public void draw(Graphics2D g) {
 
         // så inte fienden ritas när den är utanför det man ser på skärmen
-        if(notOnScreen()) return;
+        // todo nedan fungerar inte på ett bra sätt. fienderna försvinner utanför rutan.
+        //if(notOnScreen()) return;
 
         setMapPosition();
 
