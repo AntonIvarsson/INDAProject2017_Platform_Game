@@ -1,5 +1,2 @@
-# INDA2017_PROJEKT
+Game and game engine made in Java.
 
-### Det här är det nyta Repot! <3
-
-Anton Ivarsson &amp; Jacob Stachowicz INDAPROJEKT2017 GRUPP CREW4
